@@ -3,9 +3,11 @@ import { Agent } from '@mastra/core/agent';
 import { createStep, createWorkflow } from '@mastra/core/workflows';
 import { z } from 'zod';
 
+const llm = google('gemini-2.0-flash');
+
 const agent = new Agent({
   name: 'Weather Agent',
-  model: google('gemini-2.0-flash'),
+  model: llm,
   instructions: `
         You are a local activities and travel expert who excels at weather-based planning. Analyze the weather data and provide practical activity recommendations.
 
@@ -125,8 +127,11 @@ const fetchWeather = createStep({
       maxTemp: Math.max(...data.hourly.temperature_2m),
       minTemp: Math.min(...data.hourly.temperature_2m),
       condition: getWeatherCondition(data.current.weathercode),
-      precipitationChance: data.hourly.precipitation_probability.reduce((acc, curr) => Math.max(acc, curr), 0),
-      location: inputData.city,
+      precipitationChance: data.hourly.precipitation_probability.reduce(
+        (acc, curr) => Math.max(acc, curr),
+        0,
+      ),
+      location: name,
     };
 
     return forecast;
